@@ -2,31 +2,78 @@
 #include <Wire.h>
 #include <MFRC522.h>
 
+// data pins are 5, 6, 7, 8, and 10. reset is 9. clock is 13. MISO is 11, MOSI is 12
+// the idea is to leave SS_PIN alone, to comb the document for its use. somehow tihs code bypasses the firmware error.
+// just need to rewire this to take five guys all at once...
+
+// also, will made this :) anything using capital letters is the original author of this code, lol
+
 #define RST_PIN 9
-#define SS_PIN  10
+#define SS_PIN  5
+#define SS_PIN_2 6
+#define SS_PIN_3 7
+#define SS_PIN_4 8
+#define SS_PIN_5 10
 
-#define STATE_STARTUP       0
-#define STATE_STARTING      1
-#define STATE_WAITING       2
-#define STATE_SCAN_INVALID  3
-#define STATE_SCAN_VALID    4
-#define STATE_SCAN_MASTER   5
-#define STATE_ADDED_CARD    6
-#define STATE_REMOVED_CARD  7
+// dont care about these. wish i bought a mega.
 
-#define REDPIN 7
-#define GREENPIN 6
-#define Relay 5
+#define STATE_STARTUP       90
+#define STATE_STARTING      91
+#define STATE_WAITING       92
+#define STATE_SCAN_INVALID  93
+#define STATE_SCAN_VALID    94
+#define STATE_SCAN_MASTER   95
+#define STATE_ADDED_CARD    96
+#define STATE_REMOVED_CARD  97
 
-const int cardArrSize = 10;
+// or this. 
+
+#define REDPIN 87
+#define GREENPIN 86
+#define Relay 85
+
+int state = 0;
+
+// cardArrSize shows how big the values are for the UID. interesting
+
+const int cardArrSize = 9;
+const int cardArrSize2 = 10;
+const int cardArrSize3 = 11;
+const int cardArrSize4 = 12;
 const int cardSize    = 4;
-byte cardArr[cardArrSize][cardSize];
-byte masterCard[cardSize] = {356,64,93,418};   //Change Master Card ID
+byte cardArr[cardArrSize2][cardSize];
+byte cardArr2[cardArrSize3][cardSize];
+byte cardArr3[cardArrSize][cardSize];
+byte cardArr4[cardArrSize][cardSize];
+byte cardArr5[cardArrSize4][cardSize];
+byte masterCard[cardSize] = {111,210,73,72};   //Change Master Card ID
+
+// looks like masterCard is the big player over here. gonnam make 4 more of these. need to read the RFIDs. thank god this already reads without the firmware. fuck firmware.
+
+
+// oh god, the array sizes are different...
+
+byte masterCard2[cardSize] = {243,231,159,13};
+byte masterCard3[cardSize] = {35,35,251,13};
+byte masterCard4[cardSize] = {83,14,162,13};
+byte masterCard5[cardSize] = {211,173,254,246};
+
 byte readCard[cardSize];
 byte cardsStored = 0;
 
 // Create MFRC522 instance
+
 MFRC522 mfrc522(SS_PIN, RST_PIN);
+
+// might have to create multiple instances of this also, since it calls out SS_PIN directly.
+
+MFRC522 mfrc522_2(SS_PIN_2, RST_PIN);
+MFRC522 mfrc522_3(SS_PIN_3, RST_PIN);
+MFRC522 mfrc522_4(SS_PIN_4, RST_PIN);
+MFRC522 mfrc522_5(SS_PIN_5, RST_PIN);
+
+// yup, thats exactly what i had to do
+
 // Set the LCD I2C address
 
 byte currentState = STATE_STARTUP;
@@ -43,7 +90,8 @@ int readCardState()
   {
     readCard[index] = mfrc522.uid.uidByte[index];
 
-    
+    // i saw this code with the majority of the other examples ive seen, i dont think theres anything fancy here tbh
+
     Serial.print(readCard[index]);
     if (index < 3)
     {
@@ -53,6 +101,8 @@ int readCardState()
   Serial.println(" ");
 
   //Check Master Card
+
+  // now this seems like a job for my multiple masterCards. these lines below seem like callibration before rolling off. dont like that. the values will be preset beforehand. maybe i make a blank so any foreign objects get sent to a dummy value? american immigration, am i right? 
   if ((memcmp(readCard, masterCard, 4)) == 0)
   {
     return STATE_SCAN_MASTER;
@@ -70,6 +120,8 @@ int readCardState()
       return STATE_SCAN_VALID;
     }
   }
+
+  // aahhh, lines 104 to 110 show a valid case, showing cardArr as a checkpoint for validation. interesting. i need to tie this to an int for a counting design. " state " is the variable
 
  return STATE_SCAN_INVALID;
 }
@@ -203,6 +255,12 @@ void setup()
   SPI.begin();         // Init SPI Bus
   mfrc522.PCD_Init();  // Init MFRC522
 
+// a great wizard once told me that if i give this PDC_Init a 50 millisecond delay, i can cure world hunger and gain infinite riches. that dude was a weirdo, but it couldn't hurt, right?
+
+  delay(50);
+
+// there... i am still broke... and now hungry...
+
   LastStateChangeTime = millis();
   updateState(STATE_STARTING);
 
@@ -239,4 +297,4 @@ void loop()
 
   cardState = readCardState();
   updateState(cardState);
-}```
+}
