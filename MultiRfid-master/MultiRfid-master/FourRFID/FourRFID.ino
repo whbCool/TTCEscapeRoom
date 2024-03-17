@@ -56,9 +56,9 @@ byte tagarray[][4] = {
 int tagcount = 0;
 bool access = false;
 
-#define NR_OF_READERS   5
+#define NR_OF_READERS   4
 
-byte ssPins[] = {SS_1_PIN, SS_2_PIN, SS_3_PIN, SS_4_PIN, SS_5_PIN};
+byte ssPins[] = {SS_1_PIN, SS_2_PIN, SS_3_PIN, SS_4_PIN};
 
 // Create an MFRC522 instance :
 MFRC522 mfrc522[NR_OF_READERS];
@@ -87,10 +87,6 @@ void setup() {
   for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
     mfrc522[reader].PCD_Init(ssPins[reader], RST_PIN);
     delay(150);
-    Serial.print(F("Reader "));
-    Serial.print(reader);
-    Serial.print(F(": "));
-    mfrc522[reader].PCD_DumpVersionToSerial();
     //mfrc522[reader].PCD_SetAntennaGain(mfrc522[reader].RxGain_max);
   }
 }

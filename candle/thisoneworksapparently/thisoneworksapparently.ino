@@ -17,14 +17,14 @@
 
 // dont care about these. wish i bought a mega.
 
-#define STATE_STARTUP       90
-#define STATE_STARTING      91
-#define STATE_WAITING       92
-#define STATE_SCAN_INVALID  93
-#define STATE_SCAN_VALID    94
-#define STATE_SCAN_MASTER   95
-#define STATE_ADDED_CARD    96
-#define STATE_REMOVED_CARD  97
+#define STATE_STARTUP       0
+#define STATE_STARTING      1
+#define STATE_WAITING       2
+#define STATE_SCAN_INVALID  3
+#define STATE_SCAN_VALID    4
+#define STATE_SCAN_MASTER   0
+#define STATE_ADDED_CARD    0
+#define STATE_REMOVED_CARD  0
 
 // or this. 
 
@@ -88,9 +88,8 @@ unsigned long StateWaitTime;
 int readCardState()
 {
   int index;
-
   Serial.print("Card Data - ");
-  for(index = 0; index < 4; index++)
+  for(index = 0; index < 5; index++)
   {
     readCard[index] = mfrc522.uid.uidByte[index];
 
@@ -266,6 +265,7 @@ void updateState(byte aState)
 
 void setup() 
 {
+  Serial.println("im starting");
   SPI.begin();         // Init SPI Bus
   mfrc522.PCD_Init();  // Init MFRC522
 
@@ -284,6 +284,7 @@ void setup()
   digitalWrite(Relay,HIGH);
 
   Serial.begin(9600);
+  Serial.println("finished setup");
 }
 
 void loop() 
@@ -301,6 +302,8 @@ void loop()
   { 
     return; 
   }
+  
+  Serial.println(readCardState());
 
   cardState = readCardState();
   updateState(cardState);
