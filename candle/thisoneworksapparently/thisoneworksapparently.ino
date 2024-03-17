@@ -40,7 +40,7 @@ const int cardArrSize = 9;
 const int cardArrSize2 = 10;
 const int cardArrSize3 = 11;
 const int cardArrSize4 = 12;
-const int cardSize    = 4;
+const int cardSize = 4;
 byte cardArr[cardArrSize2][cardSize];
 byte cardArr2[cardArrSize3][cardSize];
 byte cardArr3[cardArrSize][cardSize];
@@ -59,7 +59,11 @@ byte masterCard4[cardSize] = {83,14,162,13};
 byte masterCard5[cardSize] = {211,173,254,246};
 
 byte readCard[cardSize];
-byte cardsStored = 0;
+byte readCard2[cardSize];
+byte readCard3[cardSize];
+byte readCard4[cardSize];
+byte readCard5[cardSize];
+byte cardsStored = 5;
 
 // Create MFRC522 instance
 
@@ -90,9 +94,19 @@ int readCardState()
   {
     readCard[index] = mfrc522.uid.uidByte[index];
 
-    // i saw this code with the majority of the other examples ive seen, i dont think theres anything fancy here tbh
+    // ok i thought this was nothing, turns out this was definitely something
 
+    readCard2[index] = mfrc522_2.uid.uidByte[index];
+    readCard3[index] = mfrc522_3.uid.uidByte[index];
+    readCard4[index] = mfrc522_4.uid.uidByte[index];
+    readCard5[index] = mfrc522_5.uid.uidByte[index];
+    
     Serial.print(readCard[index]);
+    Serial.print(readCard2[index]);
+    Serial.print(readCard3[index]);
+    Serial.print(readCard4[index]);
+    Serial.print(readCard5[index]);
+    
     if (index < 3)
     {
       Serial.print(",");
@@ -102,7 +116,7 @@ int readCardState()
 
   //Check Master Card
 
-  // now this seems like a job for my multiple masterCards. these lines below seem like callibration before rolling off. dont like that. the values will be preset beforehand. maybe i make a blank so any foreign objects get sent to a dummy value? american immigration, am i right? 
+  // now this seems like a job for multiple masterCards. these lines below seem like callibration before rolling off. dont like that. the values will be preset beforehand. maybe i make a blank so any foreign objects get sent to a dummy value? american immigration, am i right? 
   if ((memcmp(readCard, masterCard, 4)) == 0)
   {
     return STATE_SCAN_MASTER;
@@ -275,13 +289,6 @@ void setup()
 void loop() 
 {
   byte cardState;
-
-  if ((currentState != STATE_WAITING) &&
-      (StateWaitTime > 0) &&
-      (LastStateChangeTime + StateWaitTime < millis()))
-  {
-    updateState(STATE_WAITING);
-  }
 
   // Look for new cards 
   if ( ! mfrc522.PICC_IsNewCardPresent()) 
