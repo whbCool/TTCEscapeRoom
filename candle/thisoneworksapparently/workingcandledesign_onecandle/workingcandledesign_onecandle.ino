@@ -2,8 +2,14 @@
 #include <Wire.h>
 #include <MFRC522.h>
 
-#define RST_PIN 9
+#define RST_PIN2 10
+#define SS_PIN2 9
+
+#define RST_PIN 8
 #define SS_PIN  7
+
+#define RST_PIN3 6
+#define SS_PIN3 5
 
 #define STATE_STARTUP       0
 #define STATE_STARTING      1
@@ -23,6 +29,10 @@ const int cardSize    = 4;
 byte cardArr[cardArrSize][cardSize];
 byte masterCard[cardSize] = {356,64,93,418};   //Change Master Card ID
 byte readCard[cardSize];
+byte readCard2[cardSize];
+byte readCard3[cardSize];
+byte readCard4[cardSize];
+byte readCard5[cardSize];
 byte cardsStored = 0;
 
 int fsT;
@@ -34,6 +44,8 @@ int fs5;
 
 // Create MFRC522 instance
 MFRC522 mfrc522(SS_PIN, RST_PIN);
+MFRC522 mfrc522_2(SS_PIN2, RST_PIN2);
+MFRC522 mfrc522_3(SS_PIN3, RST_PIN3);
 // Set the LCD I2C address
 
 byte currentState = STATE_STARTUP;
@@ -79,10 +91,71 @@ int readCardState()
   }
 
   Serial.println(" ");
-  delay(100);
+  delay(10);
 
   // THIS IS READER 2. THIS IS READER 2. THIS IS READER 2. THIS IS READER 2. THIS IS READER 2. THIS IS READER 2. THIS IS READER 2. 
 
+   Serial.print("Reader 2: ");
+  for(index = 0; index < 4; index++)
+  {
+    readCard2[index] = mfrc522_2.uid.uidByte[index];
+    Serial.print(readCard2[index]);
+    if (index < 3)
+    {
+      Serial.print(",");
+    }
+  }
+
+  reader2 = readCard2[1];
+  Serial.print(". The value of Reader 2 is ");
+  Serial.print(reader2);
+  
+  if (reader2 == 173) {
+    Serial.print(" - VALID. State: ");
+    fs2 = 1;
+    fsT = fs1 + fs2 + fs3 + fs4 + fs5;
+    Serial.print(fsT);
+  } else {
+    Serial.print(" - INVALID. State: ");
+    fs2 = 0;
+    fsT = fs1 + fs2 + fs3 + fs4 + fs5;
+    Serial.print(fsT);
+  }
+
+  Serial.println(" ");
+  delay(10);
+
+// THIS IS READER 3. THIS IS READER 3. THIS IS READER 3. THIS IS READER 3. THIS IS READER 3. THIS IS READER 3. THIS IS READER 3. 
+
+  Serial.print("Reader 3: ");
+  for(index = 0; index < 4; index++)
+  {
+    readCard3[index] = mfrc522_3.uid.uidByte[index];
+    Serial.print(readCard3[index]);
+    if (index < 3)
+    {
+      Serial.print(",");
+    }
+  }
+
+  reader3 = readCard3[1];
+  Serial.print(". The value of Reader 3 is ");
+  Serial.print(reader3);
+  
+  if (reader3 == 173) {
+    Serial.print(" - VALID. State: ");
+    fs3 = 1;
+    fsT = fs1 + fs2 + fs3 + fs4 + fs5;
+    Serial.print(fsT);
+  } else {
+    Serial.print(" - INVALID. State: ");
+    fs3 = 0;
+    fsT = fs1 + fs2 + fs3 + fs4 + fs5;
+    Serial.print(fsT);
+  }
+
+  Serial.println(" ");
+  delay(10);
 }
 
 void setup() 
@@ -91,8 +164,16 @@ void setup()
   SPI.begin();         // Init SPI Bus
   mfrc522.PCD_Init();
   delay(50);
-  //mfrc522_2.PCD_Init();
+  mfrc522_2.PCD_Init();
+  delay(50);
+  mfrc522_3.PCD_Init();
+  delay(50);
   fsT = 0;
+  fs1 = 0;
+  fs2 = 0;
+  fs3 = 0;
+  fs4 = 0;
+  fs5 = 0;
   LastStateChangeTime = millis();
   
   Serial.begin(9600);
@@ -112,17 +193,39 @@ void loop()
   // Look for new cards 
   if ( ! mfrc522.PICC_IsNewCardPresent()) 
   { 
-    return; 
+    readCardState(); 
   } 
   
   // Select one of the cards 
+
   if ( ! mfrc522.PICC_ReadCardSerial()) 
   { 
-    return; 
+    readCardState(); 
   }
 
-  readCardState();
+  if ( ! mfrc522_2.PICC_IsNewCardPresent()) 
+  { 
+    readCardState(); 
+  } 
   
+  // Select one of the cards 
+
+  if ( ! mfrc522_2.PICC_ReadCardSerial()) 
+  { 
+    readCardState(); 
+  }
+
+  if ( ! mfrc522_3.PICC_IsNewCardPresent()) 
+  { 
+    readCardState(); 
+  } 
+  
+  // Select one of the cards 
+
+  if ( ! mfrc522_3.PICC_ReadCardSerial()) 
+  { 
+    readCardState();
+  }
 }
 
 
