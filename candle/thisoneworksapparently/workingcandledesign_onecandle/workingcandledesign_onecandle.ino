@@ -11,6 +11,12 @@
 #define RST_PIN3 6
 #define SS_PIN3 5
 
+#define RST_PIN4 4
+#define SS_PIN4 3
+
+#define RST_PIN5 2
+#define SS_PIN5 1
+
 #define STATE_STARTUP       0
 #define STATE_STARTING      1
 #define STATE_WAITING       2
@@ -46,6 +52,8 @@ int fs5;
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 MFRC522 mfrc522_2(SS_PIN2, RST_PIN2);
 MFRC522 mfrc522_3(SS_PIN3, RST_PIN3);
+MFRC522 mfrc522_4(SS_PIN4, RST_PIN4);
+MFRC522 mfrc522_5(SS_PIN5, RST_PIN5);
 // Set the LCD I2C address
 
 byte currentState = STATE_STARTUP;
@@ -156,8 +164,75 @@ int readCardState()
 
   Serial.println(" ");
   delay(10);
-}
 
+  // THIS IS READER 4. THIS IS READER 4. THIS IS READER 4. THIS IS READER 4. THIS IS READER 4. THIS IS READER 4. THIS IS READER 4.  
+
+  Serial.print("Reader 4: ");
+  for(index = 0; index < 4; index++)
+  {
+    readCard4[index] = mfrc522_4.uid.uidByte[index];
+    Serial.print(readCard4[index]);
+    if (index < 3)
+    {
+      Serial.print(",");
+    }
+  }
+
+  reader4 = readCard4[1];
+  Serial.print(". The value of Reader 4 is ");
+  Serial.print(reader4);
+  
+  if (reader4 == 173) {
+    Serial.print(" - VALID. State: ");
+    fs4 = 1;
+    fsT = fs1 + fs2 + fs3 + fs4 + fs5;
+    Serial.print(fsT);
+  } else {
+    Serial.print(" - INVALID. State: ");
+    fs4 = 0;
+    fsT = fs1 + fs2 + fs3 + fs4 + fs5;
+    Serial.print(fsT);
+  }
+
+  Serial.println(" ");
+  delay(10);
+
+  // THIS IS READER 5. THIS IS READER 5. THIS IS READER 5. THIS IS READER 5. THIS IS READER 5. THIS IS READER 5. THIS IS READER 5. 
+
+  Serial.print("Reader 5: ");
+  for(index = 0; index < 4; index++)
+  {
+    readCard5[index] = mfrc522_5.uid.uidByte[index];
+    Serial.print(readCard5[index]);
+    if (index < 3)
+    {
+      Serial.print(",");
+    }
+  }
+
+  reader5 = readCard5[1];
+  Serial.print(". The value of Reader 5 is ");
+  Serial.print(reader5);
+  
+  if (reader5 == 173) {
+    Serial.print(" - VALID. State: ");
+    fs5 = 1;
+    fsT = fs1 + fs2 + fs3 + fs4 + fs5;
+    Serial.print(fsT);
+  } else {
+    Serial.print(" - INVALID. State: ");
+    fs5 = 0;
+    fsT = fs1 + fs2 + fs3 + fs4 + fs5;
+    Serial.print(fsT);
+  }
+
+  Serial.println(" ");
+  delay(10);
+
+  if (fsT == 5) {
+    Serial.print(" - CLEAR CONDITION REACHED!"); //whew...
+  }
+}
 void setup() 
 {
   Serial.println("Active");
@@ -167,6 +242,10 @@ void setup()
   mfrc522_2.PCD_Init();
   delay(50);
   mfrc522_3.PCD_Init();
+  delay(50);
+  mfrc522_4.PCD_Init();
+  delay(50);
+  mfrc522_5.PCD_Init();
   delay(50);
   fsT = 0;
   fs1 = 0;
@@ -223,6 +302,30 @@ void loop()
   // Select one of the cards 
 
   if ( ! mfrc522_3.PICC_ReadCardSerial()) 
+  { 
+    readCardState();
+  }
+
+  if ( ! mfrc522_4.PICC_IsNewCardPresent()) 
+  { 
+    readCardState(); 
+  } 
+  
+  // Select one of the cards 
+
+  if ( ! mfrc522_4.PICC_ReadCardSerial()) 
+  { 
+    readCardState(); 
+  }
+
+  if ( ! mfrc522_5.PICC_IsNewCardPresent()) 
+  { 
+    readCardState(); 
+  } 
+  
+  // Select one of the cards 
+
+  if ( ! mfrc522_5.PICC_ReadCardSerial()) 
   { 
     readCardState();
   }
