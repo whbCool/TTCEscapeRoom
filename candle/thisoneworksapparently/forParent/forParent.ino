@@ -74,7 +74,7 @@ int readCardState()
   Serial.print(". The value of Reader 1 is ");
   Serial.print(reader1);
   
-  if (reader1 == 210) {
+  if (reader1 == 14) {
     Serial.print(" - VALID. State: ");
     fs1 = 1;
     fsT = fs1 + fs2 + fs3 + fs4 + fs5;
@@ -106,7 +106,7 @@ int readCardState()
   Serial.print(". The value of Reader 2 is ");
   Serial.print(reader2);
   
-  if (reader2 == 173) {
+  if (reader2 == 14) {
     Serial.print(" - VALID. State: ");
     fs2 = 1;
     fsT = fs1 + fs2 + fs3 + fs4 + fs5;
@@ -128,7 +128,7 @@ int readCardState()
       fs4 = 1;
       fs5 = 1;
       if (fsT = 5) {
-        Serial.print(" Clear Condition Reached!")
+        Serial.print(" Clear Condition Reached!");
       }
      }
   }else {
@@ -137,7 +137,6 @@ int readCardState()
       fs5 = 0;
       Serial.print(" - Waiting for Interrupt..."); //whew...
   }
-
 
   Serial.println(" ");
   Serial.println("________________________");
